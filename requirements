@@ -1,0 +1,6 @@
+telebot             0.0.5
+pyTelegramBotAPI    4.14.0
+pytest              7.4.3
+pip                 23.3.1
+python-telegram-bot 13.7
+beautifulsoup4      4.12.2

@@ -8,7 +8,7 @@ Token = '6828169517:AAG0AbnPSw1Y4g_mnCYIQeUf5z6eW8m42v8'
 api_key = '85a8fa826a63403bab28c51a2e679579'
 
 bot = telebot.TeleBot(Token)
-main_url = None
+main_url = 'https://newsapi.org/v2/everything?q=bitcoin&apiKey=85a8fa826a63403bab28c51a2e679579'
 language = None
 time = None
 keyword = None
@@ -245,5 +245,7 @@ def news(message):
                                           f'Подробнее о данной новости...</a>\n'
                                           f'{news_time[news_title.index(info)]}',
                          reply_markup=markup, parse_mode='html')
-    return main_url
-git
+
+
+bot.polling()
+
