@@ -181,7 +181,6 @@ def gainer2(message):
 
     :param message:
     :type message: telebot.types.Message
-    :return:
     """
     global keyword, main_url
     keyword = 'q=' + message.text
