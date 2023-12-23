@@ -221,7 +221,6 @@ def news(message):
 
     :param message:
     :type message: telebot.types.Message
-    :returns: None
     """
     global main_url
     main_url = requests.get(main_url).json()
@@ -247,11 +246,10 @@ def news(message):
                                           f'Подробнее о данной новости...</a>\n'
                                           f'{news_time[news_title.index(info)]}',
                          reply_markup=markup, parse_mode='html')
-        return True
+
 
     except KeyError:
         bot.send_message(message.chat.id, main_url['message'], reply_markup=markup)
-        return False
 
 
 if __name__ == '__main__':
