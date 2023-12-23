@@ -5,13 +5,6 @@ from random import randint
 main_url = 'https://newsapi.org/v2/everything?q=tesla&from=2023-11-23&sortBy=publishedAt&apiKey=85a8fa826a63403bab28c51a2e679579'
 
 def news():
-    """
-    Get news.
-
-    :param message:
-    :type message: telebot.types.Message
-    :returns: None
-    """
     global main_url
     main_url = requests.get(main_url).json()
     markup = types.InlineKeyboardMarkup()
