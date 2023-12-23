@@ -24,17 +24,18 @@ def start(message):
     """
     database = sqlite3.connect('Keyword.sql')
     cursor = database.cursor()
-
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS Keywords (
-    Word TEXT PRIMARY KEY,
+    word TEXT PRIMARY KEY,
     count INTEGER NOT NULL )
     ''')
-
+    cursor.execute("SELECT EXISTS(SELECT * FROM Keywords)")
+    c = cursor.fetchone()
+    if c == 0:
+        cursor.execute('''INSERT INTO Keywords (word, count) VALUES ('%s',' %s')''' % ('None', -1))
     database.commit()
     cursor.close()
     database.close()
-
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('Get news', callback_data='menu'))
     bot.send_message(message.chat.id, 'Добро пожаловать на новостной бот ViNewsBot!\n'
@@ -88,7 +89,7 @@ def information(message):
         cursor = database.cursor()
         cursor.execute("SELECT * FROM Keywords")
         data = cursor.fetchall()
-        if len(data) > 0:
+        if len(data) > 1:
             cursor.execute("SELECT MAX(count) FROM Keywords")
             cursor.execute("SELECT word FROM Keywords WHERE count = ?", (cursor.fetchall()[0]))
             word = cursor.fetchall()
@@ -101,7 +102,6 @@ def information(message):
                     markup.add(types.KeyboardButton(word[i][0]))
                 bot.send_message(message.chat.id, 'Main keywords', reply_markup=markup)
             bot.register_next_step_handler(message, gainer2)
-
         else:
             markup = types.InlineKeyboardMarkup()
             btn1 = types.InlineKeyboardButton('Вернуться в меню', callback_data='menu')
@@ -133,7 +133,7 @@ def gainer1(msg):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Select') or call.data.startswith('Skip'))
 def gainer1_1(call):
     """
-
+    Write time if call data is 'Select' else gain news
 
     :param call:
     :type call: telebot.types.CallbackQuery
@@ -226,26 +226,33 @@ def news(message):
     global main_url
     main_url = requests.get(main_url).json()
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton('Вернуться в меню', callback_data='menu'))
-    article = main_url['articles']
-    news_title = []
-    news_url = []
-    news_time = []
-    counter = 0
-    for art in article:
-        news_title.append(art['title'])
-        news_url.append(art['url'])
-        news_time.append(art['publishedAt'])
-        counter += 1
-        if counter >= 5:
-            break
+    btn1 = types.InlineKeyboardButton('Вернуться в меню', callback_data='menu')
+    markup.row(btn1)
+    try:
+        article = main_url['articles']
+        news_title = []
+        news_url = []
+        news_time = []
+        counter = 0
+        for art in article:
+            news_title.append(art['title'])
+            news_url.append(art['url'])
+            news_time.append(art['publishedAt'])
+            counter += 1
+            if counter >= 5:
+                break
 
         info = news_title[randint(0, counter-1)]
         bot.send_message(message.chat.id, f'{info}\n<a href=\"{news_url[news_title.index(info)]}\">'
                                           f'Подробнее о данной новости...</a>\n'
                                           f'{news_time[news_title.index(info)]}',
                          reply_markup=markup, parse_mode='html')
+        return True
+
+    except KeyError:
+        bot.send_message(message.chat.id, main_url['message'], reply_markup=markup)
+        return False
 
 
-bot.polling()
-
+if __name__ == '__main__':
+    bot.polling()
